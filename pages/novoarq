@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mensagem Anônima</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        animation: slideIn 0.8s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .icon {
+        font-size: 48px;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      h1 {
+        color: white;
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-weight: 300;
+        letter-spacing: 1px;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .input-group {
+        margin-bottom: 25px;
+        position: relative;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      textarea:focus {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        transform: scale(1.02);
+      }
+
+      textarea::placeholder {
+        color: #999;
+        font-style: italic;
+      }
+
+      .char-counter {
+        position: absolute;
+        bottom: -20px;
+        right: 5px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.3s ease;
+      }
+
+      .char-counter.warning {
+        color: #ff6b6b;
+      }
+
+      .submit-btn {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+        min-width: 200px;
+      }
+
+      .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .submit-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .submit-btn:hover::before {
+        left: 100%;
+      }
+
+      .message {
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        animation: fadeIn 0.5s ease-out;
+        display: none;
+      }
+
+      .message.success {
+        background: rgba(46, 204, 113, 0.9);
+        color: white;
+      }
+
+      .message.error {
+        background: rgba(231, 76, 60, 0.9);
+        color: white;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .privacy-note {
+        margin-top: 20px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.4;
+      }
+
+      .privacy-icons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 15px;
+      }
+
+      .privacy-icon {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .privacy-icon:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+      }
+
+      .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: none;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+          margin: 20px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles-container"></div>
+
+    <div class="container">
+      <div class="icon">🔒</div>
+      <h1>Mensagem Anônima</h1>
+      <p class="subtitle">
+        Compartilhe seus pensamentos de forma completamente anônima e segura.
+        Nenhuma informação pessoal é coletada ou armazenada.
+      </p>
+
+      <form id="anonymousForm">
+        <div class="input-group">
+          <textarea
+            id="message"
+            placeholder="Digite sua mensagem aqui..."
+            maxlength="1000"
+            required
+          ></textarea>
+          <div class="char-counter" id="charCounter">0/1000</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="btnText">Enviar Mensagem</span>
+          <div class="loading-spinner" id="loadingSpinner"></div>
+        </button>
+      </form>
+
+      <div class="message success" id="successMessage">
+        ✅ Mensagem enviada com sucesso! Obrigado por compartilhar de forma
+        anônima.
+      </div>
+
+      <div class="message error" id="errorMessage">
+        ❌ Erro ao enviar mensagem. Tente novamente.
+      </div>
+
+      <div class="privacy-note">
+        <strong>100% Anônimo:</strong> Não coletamos IP, cookies ou qualquer
+        dado pessoal.
+      </div>
+
+      <div class="privacy-icons">
+        <div
+          class="privacy-icon"
+          title="Sem rastreamento"
+          data-tooltip="Nenhum dado é rastreado"
+        >
+          🚫
+        </div>
+        <div
+          class="privacy-icon"
+          title="Criptografado"
+          data-tooltip="Comunicação segura"
+        >
+          🔐
+        </div>
+        <div
+          class="privacy-icon"
+          title="Privado"
+          data-tooltip="Totalmente anônimo"
+        >
+          👤
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Classe principal da aplicação
+      class AnonymousMessageApp {
+        constructor() {
+          this.form = document.getElementById("anonymousForm");
+          this.messageInput = document.getElementById("message");
+          this.submitBtn = document.getElementById("submitBtn");
+          this.btnText = document.getElementById("btnText");
+          this.loadingSpinner = document.getElementById("loadingSpinner");
+          this.charCounter = document.getElementById("charCounter");
+          this.successMessage = document.getElementById("successMessage");
+          this.errorMessage = document.getElementById("errorMessage");
+
+          this.maxChars = 1000;
+          this.isSubmitting = false;
+
+          this.init();
+        }
+
+        init() {
+          this.setupEventListeners();
+          this.createParticles();
+          this.updateCharCounter();
+        }
+
+        setupEventListeners() {
+          // Evento de envio do formulário
+          this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+
+          // Contador de caracteres
+          this.messageInput.addEventListener("input", () =>
+            this.updateCharCounter(),
+          );
+
+          // Efeitos de foco
+          this.messageInput.addEventListener("focus", () => this.handleFocus());
+          this.messageInput.addEventListener("blur", () => this.handleBlur());
+
+          // Tooltips para ícones de privacidade
+          this.setupPrivacyTooltips();
+        }
+
+        async handleSubmit(e) {
+          e.preventDefault();
+
+          if (this.isSubmitting) return;
+
+          const message = this.messageInput.value.trim();
+
+          if (!message) {
+            this.showMessage("Por favor, digite uma mensagem.", "error");
+            return;
+          }
+
+          if (message.length > this.maxChars) {
+            this.showMessage(
+              `A mensagem deve ter no máximo ${this.maxChars} caracteres.`,
+              "error",
+            );
+            return;
+          }
+
+          await this.submitMessage(message);
+        }
+
+        async submitMessage(message) {
+          this.setLoadingState(true);
+
+          try {
+            // Simular envio para API
+            await this.simulateApiCall(message);
+
+            this.showMessage(
+              "Mensagem enviada com sucesso! Obrigado por compartilhar de forma anônima.",
+              "success",
+            );
+            this.resetForm();
+          } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+            this.showMessage(
+              "Erro ao enviar mensagem. Tente novamente.",
+              "error",
+            );
+          } finally {
+            this.setLoadingState(false);
+          }
+        }
+
+        async simulateApiCall(message) {
+          // Simula chamada para API
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              // Simula sucesso 90% das vezes
+              if (Math.random() > 0.1) {
+                console.log("Mensagem enviada:", message);
+                resolve();
+              } else {
+                reject(new Error("Erro simulado"));
+              }
+            }, 1500);
+          });
+        }
+
+        setLoadingState(isLoading) {
+          this.isSubmitting = isLoading;
+          this.submitBtn.disabled = isLoading;
+
+          if (isLoading) {
+            this.btnText.style.display = "none";
+            this.loadingSpinner.style.display = "block";
+          } else {
+            this.btnText.style.display = "block";
+            this.loadingSpinner.style.display = "none";
+          }
+        }
+
+        updateCharCounter() {
+          const currentLength = this.messageInput.value.length;
+          this.charCounter.textContent = `${currentLength}/${this.maxChars}`;
+
+          // Mudar cor quando próximo do limite
+          if (currentLength > this.maxChars * 0.8) {
+            this.charCounter.classList.add("warning");
+          } else {
+            this.charCounter.classList.remove("warning");
+          }
+        }
+
+        handleFocus() {
+          if (this.messageInput.value === "") {
+            this.messageInput.placeholder = "Escreva livremente...";
+          }
+        }
+
+        handleBlur() {
+          if (this.messageInput.value === "") {
+            this.messageInput.placeholder = "Digite sua mensagem aqui...";
+          }
+        }
+
+        showMessage(text, type) {
+          // Esconder mensagens anteriores
+          this.successMessage.style.display = "none";
+          this.errorMessage.style.display = "none";
+
+          const messageElement =
+            type === "success" ? this.successMessage : this.errorMessage;
+          messageElement.textContent = text;
+          messageElement.style.display = "block";
+
+          // Auto-esconder após 5 segundos
+          setTimeout(() => {
+            messageElement.style.display = "none";
+          }, 5000);
+        }
+
+        resetForm() {
+          this.messageInput.value = "";
+          this.updateCharCounter();
+          this.messageInput.placeholder = "Digite sua mensagem aqui...";
+        }
+
+        createParticles() {
+          const container = document.getElementById("particles-container");
+          const particleCount = 6;
+
+          for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement("div");
+            particle.className = "particle";
+
+            // Posições aleatórias
+            particle.style.top = Math.random() * 100 + "%";
+            particle.style.left = Math.random() * 100 + "%";
+            particle.style.animationDelay = Math.random() * 6 + "s";
+
+            container.appendChild(particle);
+          }
+        }
+
+        setupPrivacyTooltips() {
+          const icons = document.querySelectorAll(".privacy-icon");
+          icons.forEach((icon) => {
+            icon.addEventListener("mouseenter", (e) => {
+              const tooltip = e.target.getAttribute("data-tooltip");
+              if (tooltip) {
+                console.log("Tooltip:", tooltip);
+                // Aqui você pode implementar um tooltip visual se quiser
+              }
+            });
+          });
+        }
+      }
+
+      // Inicializar aplicação quando DOM estiver pronto
+      document.addEventListener("DOMContentLoaded", () => {
+        new AnonymousMessageApp();
+      });
+
+      // Utilities globais
+      window.AnonymousUtils = {
+        // Função para limpar dados sensíveis (se necessário)
+        clearSensitiveData() {
+          // Limpar qualquer dado que possa estar em memória
+          console.log("Dados sensíveis limpos");
+        },
+
+        // Validar mensagem
+        validateMessage(message) {
+          const trimmed = message.trim();
+          return {
+            isValid: trimmed.length > 0 && trimmed.length <= 1000,
+            message: trimmed,
+            length: trimmed.length,
+          };
+        },
+      };
+    </script>
+  </body>
+</html>
